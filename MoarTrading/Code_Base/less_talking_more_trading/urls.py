@@ -14,16 +14,22 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import include, path
 from less_talking_more_trading.views import home_view
 from less_talking_more_trading.views import data_test_view
-from less_talking_more_trading.views import form_example_view, basic_order_view, basic_sell_view, options_view
+from less_talking_more_trading.views import form_example_view, basic_order_view, basic_sell_view, options_view, options_query_view
+from less_talking_more_trading.views import options_data_view                                     
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('home/', home_view.as_view(), name='home_view'),
+    path('home/', home_view.as_view(), name='home'),
     path('data_test/', data_test_view.as_view(), name='data_test'),
     path('form_example/', form_example_view.as_view(), name='form_example'),
     path('basic_order/', basic_order_view.as_view(), name='basic_order'),
     path('options_order/', options_view.as_view(), name='options_order'),
-    path('sell_basic/', basic_sell_view.as_view(), name='sell_basic')
+    path('options_query/', options_query_view.as_view(), name='options_query'),
+    path('options_data/', options_data_view.as_view(), name='options_data'),
+    path('sell_basic/', basic_sell_view.as_view(), name='sell_basic'),
+    path('site_users/', include('django.contrib.auth.urls')),
+    path('', include('site_users.urls')),
 ]

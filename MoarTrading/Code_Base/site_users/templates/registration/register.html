@@ -11,7 +11,7 @@
 
         {% endblock %}
 
-        {% block base_title %}<title>Basic Order</title>{% endblock %} 
+        {% block base_title %}<title>Registration</title>{% endblock %} 
         
     </head>
 
@@ -24,11 +24,12 @@
             
             {{ form | crispy }}
 
-            <button type="submit">Buy</button>
+            <button type="submit">Register test</button>
 
 
         </form>
           
+        {{ message }}
         
         {% endblock %}
     </body>

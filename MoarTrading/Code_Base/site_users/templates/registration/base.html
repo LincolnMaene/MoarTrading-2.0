@@ -1,0 +1,49 @@
+{% load static %}
+
+
+
+<!DOCTYPE html>
+   <!-- this should add bootstrap, jquery -->
+   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+
+   <!-- jQuery library -->
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+   
+   <!-- Latest compiled JavaScript -->
+   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script> 
+ 
+    <!-- Latest compiled and minified chart.js -->
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js" integrity="sha512-TW5s0IT/IppJtu76UbysrBH9Hy/5X41OTAbQuffZFU6lQ1rdcLHzpU5BzVvr/YFykoiMYZVWlr/PX1mDcfM9Qg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+   
+
+
+
+
+<html>
+    <head> 
+ 
+     <!-- having these blocks allow overredide in child pages -->
+        {% block base_head %}
+
+        {% endblock %}
+
+        {% block base_title %}<title>Default Title</title>{% endblock %} 
+        
+    </head>
+
+    <body>
+        {% block base_body %}
+        <div class="card" style="width: 18rem;">
+            <img src="..." class="card-img-top" alt="...">
+            <div class="card-body">
+              <h5 class="card-title">Card title</h5>
+              <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+              <a href="#" class="btn btn-primary">Go somewhere</a>
+            </div>
+          </div>
+          
+        <p>This is an example of a simple HTML page with one paragraph.</p>
+        {% endblock %}
+    </body>
+</html>

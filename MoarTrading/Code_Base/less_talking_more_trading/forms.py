@@ -19,10 +19,11 @@ class form_example(forms.Form):
 
 
 class order_form_basic(forms.Form):
-    
+    timing=[('Day', 'day'), ('Good Till Cancel','good till cancel'), ('Fill or Kill','fill or kill')]
     company_symbol= forms.CharField()
     stock_quantity= forms.IntegerField()
     price_limit= forms.DecimalField()
+    timing = forms.ChoiceField(choices=timing)
 
 class sell_form_basic(forms.Form):
     
@@ -32,10 +33,15 @@ class sell_form_basic(forms.Form):
     
 
 class options_form(forms.Form):
+   
+    underlying_symbol= forms.CharField()
+    quantity=forms.IntegerField()
+    
+class options_query_form(forms.Form):
     put_or_call=[('PUT', 'p'), ('Call','c')]
     underlying_symbol= forms.CharField()
-    expiration_date = forms.DateTimeField()
+    start_date = forms.DateTimeField()
+    strike_number=forms.IntegerField()
+    end_date = forms.DateTimeField()
     contract_type = forms.ChoiceField(choices=put_or_call)
-    strike_price_as_string =forms.CharField()
-    
 
