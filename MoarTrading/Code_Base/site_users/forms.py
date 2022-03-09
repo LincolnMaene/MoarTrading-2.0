@@ -23,7 +23,7 @@ class LoginForm(forms.Form):
     username= forms.CharField()
     password = forms.CharField()
     
-# Basically we are hooking the create_user_profile
+# Basically we are hooking the create_user_profile, this is not a form, it's a model i'm too affraid to move
 #  and save_user_profile methods to the User model, 
 #  whenever a save event occurs. This kind of signal is called post_save. 
 

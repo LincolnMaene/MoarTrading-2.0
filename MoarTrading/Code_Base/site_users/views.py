@@ -12,12 +12,25 @@ from .forms import UpdateProfileForm
 from django.views.generic import CreateView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.forms import UserCreationForm
+from less_talking_more_trading.config import acct_id
 
+# #example for how to access user profile in function based view
+    # u = User.objects.get(username=request.user.username)
+    # tda_id = u.profile.tdameritrade_id
+
+
+   
+
+    # print(acct_id)
+
+    #for class based views use: self.request.user.username
 
 
 
 @login_required
 def profile(request):
+    
+
     if request.method == 'POST':
         #user_form = UpdateUserForm(request.POST, instance=request.user)
         profile_form = UpdateProfileForm(request.POST, request.FILES, instance=request.user.profile)
@@ -27,7 +40,7 @@ def profile(request):
             #user_form.save()
             profile_form.save()
             messages.success(request, 'Your profile is updated successfully')
-            return redirect(to='users-profile')
+            return redirect(to='home')
     else:
         #user_form = UpdateUserForm(instance=request.user)
         profile_form = UpdateProfileForm(instance=request.user.profile)
@@ -47,7 +60,7 @@ class LoginPageView(LoginView):
     
     template_name = 'registration/login.html'
     form_class = LoginForm
-    success_url = reverse_lazy('home_view')
+    success_url = reverse_lazy('home')
     success_message = "Login Successful"
     
     def get(self, request):
@@ -64,7 +77,7 @@ class LoginPageView(LoginView):
             )
             if user is not None:
                 login(request, user)
-                return redirect('home_view')
+                return redirect('home')
         message = 'Login failed!'
         return render(request, self.template_name, context={'form': form, 'message': message})
 

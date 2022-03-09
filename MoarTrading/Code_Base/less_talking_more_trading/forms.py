@@ -5,6 +5,9 @@ from crispy_forms.helper import FormHelper
 
 Exaxmple_Choices=[('question', 'Question'), ('other','Other')]
 
+
+
+
 class form_example(forms.Form):
 
     helper=FormHelper()
@@ -17,19 +20,53 @@ class form_example(forms.Form):
     subject=forms.CharField (required=False)
     body = forms.CharField(widget=forms.Textarea)
 
+class sale_trigger_form(forms.Form):
+
+    timing=[('Day', 'day'), ('Good Till Cancel','good till cancel'), ('Fill or Kill','fill or kill')]
+    session=[('Seamless', 'seamless'), ('AM','am'), ('PM','pm'), ('Normal','normal')]
+    company_1_symbol= forms.CharField(label='First Company Symbol: ')
+    stock_1_quantity= forms.IntegerField(label='First Company Stock Quantity: ')
+    price_1_limit= forms.DecimalField(label='First Company Price limit: ')
+    timing = forms.ChoiceField(choices=timing)
+    session = forms.ChoiceField(choices=session)
+    company_2_symbol= forms.CharField(label='Second Company Symbol: ')
+    stock_2_quantity= forms.IntegerField(label='Second Company Stock Quantity: ')
+    price_2_limit= forms.DecimalField(label='Third Company Price limit: ')
+
+class order_trigger_form(forms.Form):
+
+    timing=[('Day', 'day'), ('Good Till Cancel','good till cancel'), ('Fill or Kill','fill or kill')]
+    session=[('Seamless', 'seamless'), ('AM','am'), ('PM','pm'), ('Normal','normal')]
+    company_1_symbol= forms.CharField(label='First Company Symbol: ')
+    stock_1_quantity= forms.IntegerField(label='First Company Stock Quantity: ')
+    price_1_limit= forms.DecimalField(label='First Company Price limit: ')
+    timing = forms.ChoiceField(choices=timing)
+    session = forms.ChoiceField(choices=session)
+    company_2_symbol= forms.CharField(label='Second Company Symbol: ')
+    stock_2_quantity= forms.IntegerField(label='Second Company Stock Quantity: ')
+    price_2_limit= forms.DecimalField(label='Third Company Price limit: ')
+
 
 class order_form_basic(forms.Form):
     timing=[('Day', 'day'), ('Good Till Cancel','good till cancel'), ('Fill or Kill','fill or kill')]
+    session=[('Seamless', 'seamless'), ('AM','am'), ('PM','pm'), ('Normal','normal')]
     company_symbol= forms.CharField()
     stock_quantity= forms.IntegerField()
     price_limit= forms.DecimalField()
     timing = forms.ChoiceField(choices=timing)
+    session = forms.ChoiceField(choices=session)
+
 
 class sell_form_basic(forms.Form):
     
+    timing=[('Day', 'day'), ('Good Till Cancel','good till cancel'), ('Fill or Kill','fill or kill')]
+    session=[('Seamless', 'seamless'), ('AM','am'), ('PM','pm'), ('Normal','normal')]
+
     sell_company_symbol= forms.CharField()
     sell_quantity= forms.IntegerField()
     sell_price_limit= forms.DecimalField()
+    timing = forms.ChoiceField(choices=timing)
+    session = forms.ChoiceField(choices=session)
     
 
 class options_form(forms.Form):

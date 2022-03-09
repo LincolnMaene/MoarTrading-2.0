@@ -3,16 +3,31 @@ import datetime
 import email
 from this import d
 from django.shortcuts import render
-from django.http import HttpResponse
 from django.views.generic import View
 from django.views.generic.edit import FormView
 from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .forms import form_example, order_form_basic, sell_form_basic, options_form, options_query_form
-from .order_generator import order_basic, obtain_options_symbol, options_order_single
-from .sell_generator import sell_basic
+from .forms import(form_example, order_form_basic, sell_form_basic, options_form, options_query_form,
+    order_trigger_form, sale_trigger_form
+)
+from .order_generator import order_basic, one_order_triggers_another, options_order_single, generate_buy_equity_order
+from .sell_generator import sell_basic, generate_sell_equity_order,sale_order_triggers_another
 from .option_chains_generator import generate_options_calls_date, generate_options_put_date
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+
+
+# #example for how to access user profile in function based view
+    # u = User.objects.get(username=request.user.username)
+    # tda_id = u.profile.tdameritrade_id
+
+
+   
+
+    # print(acct_id)
+
+    #for class based views use: self.request.user.username
 
 
 
@@ -23,29 +38,99 @@ trial_end_date=datetime.datetime.strptime('2022-2-22', '%Y-%m-%d').date()
 options_query_object=generate_options_calls_date('GOOG', 300 , trial_start_date, trial_end_date) #this will hold query data for option chains
 
 #setup for options query object ends here
-class form_example_view(FormView):
 
-    # we grab the model form
-    
-   
-    template_name='form_example.html'
+class sale_trigger_sale_view(FormView):
 
-    form_class=form_example
+    template_name='one_sale_triggers_another.html'
+
+    form_class=sale_trigger_form
 
     success_url='/home'
 
 
     def form_valid(self, form):
-        
-        name=form.cleaned_data['name']
-        email=form.cleaned_data['email']
+
+        username_query=self.request.user.username #get id of logged in user 
+
+        logged_in_user =  User.objects.get(username=username_query) #get user object
+
+        tda_id = logged_in_user.profile.tdameritrade_id #get user ameritrade id
 
         
 
-        # same for all other fields, can also do form.save() if model form
+
+        company_1_symbol=form.cleaned_data['company_1_symbol']#GET compay 1 daTA
+        stock_1_quantity=form.cleaned_data['stock_1_quantity']
+        price_1_limit=form.cleaned_data['price_1_limit']
+
+        company_2_symbol=form.cleaned_data['company_2_symbol']#GET compay 2 daTA
+        stock_2_quantity=form.cleaned_data['stock_2_quantity']
+        price_2_limit=form.cleaned_data['price_2_limit']
+        timing=form.cleaned_data['timing'] #useless better to replace with choice between trigger cancel and trigger order
+        session=form.cleaned_data['session']  #useless better to replace with choice between trigger cancel and trigger order
+
+        order_1=generate_sell_equity_order(company_1_symbol, stock_1_quantity, price_1_limit)
+        order_2=generate_sell_equity_order(company_2_symbol, stock_2_quantity, price_2_limit)
+
+        sale_order_triggers_another(tda_id, order_1, order_2)
+
+        #print(company_1_symbol,stock_1_quantity, price_1_limit, company_2_symbol,stock_2_quantity, price_2_limit)
+
+    
 
 
-        print(name, email)
+
+
+
+        
+
+        return super().form_valid(form)
+
+
+class order_trigger_order_view(FormView):
+
+    template_name='one_order_trig_another.html'
+
+    form_class=order_trigger_form
+
+    success_url='/home'
+
+
+    def form_valid(self, form):
+
+        username_query=self.request.user.username #get id of logged in user 
+
+        logged_in_user =  User.objects.get(username=username_query) #get user object
+
+        tda_id = logged_in_user.profile.tdameritrade_id #get user ameritrade id
+
+        
+
+
+        company_1_symbol=form.cleaned_data['company_1_symbol']#GET compay 1 daTA
+        stock_1_quantity=form.cleaned_data['stock_1_quantity']
+        price_1_limit=form.cleaned_data['price_1_limit']
+
+        company_2_symbol=form.cleaned_data['company_2_symbol']#GET compay 2 daTA
+        stock_2_quantity=form.cleaned_data['stock_2_quantity']
+        price_2_limit=form.cleaned_data['price_2_limit']
+        timing=form.cleaned_data['timing']  #useless better to replace with choice between trigger cancel and trigger order
+        session=form.cleaned_data['session'] #useless better to replace with choice between trigger cancel and trigger order
+
+        order_1=generate_buy_equity_order(company_1_symbol, stock_1_quantity, price_1_limit)
+        order_2=generate_buy_equity_order(company_2_symbol, stock_2_quantity, price_2_limit)
+
+        one_order_triggers_another(tda_id, order_1, order_2)
+
+        #print(company_1_symbol,stock_1_quantity, price_1_limit, company_2_symbol,stock_2_quantity, price_2_limit)
+
+    
+
+
+
+
+
+        
 
         return super().form_valid(form)
 
@@ -60,13 +145,19 @@ class options_view(FormView):
 
 
     def form_valid(self, form):
+
+        username_query=self.request.user.username #get id of logged in user 
+
+        logged_in_user =  User.objects.get(username=username_query) #get user object
+
+        tda_id = logged_in_user.profile.tdameritrade_id #get user ameritrade id
         
         underlying_symbol=form.cleaned_data['underlying_symbol']
         quantity=form.cleaned_data['quantity']
         
         #print(underlying_symbol, expiration_date, contract_type, strike_price_as_string)
 
-        options_order_single(underlying_symbol,quantity)
+        options_order_single(underlying_symbol,quantity, tda_id)
 
 
 
@@ -133,15 +224,30 @@ class basic_order_view(FormView):
 
     success_url='/home'
 
+    
+
 
     def form_valid(self, form):
         
+        username_query=self.request.user.username #get id of logged in user 
+
+        logged_in_user =  User.objects.get(username=username_query) #get user object
+
+        tda_id = logged_in_user.profile.tdameritrade_id #get user ameritrade id
+
+        # print('acct id: ')
+        # print(tda_id)
+
+
+
+
         company_symbol=form.cleaned_data['company_symbol']
         stock_quantity=form.cleaned_data['stock_quantity']
         price_limit=form.cleaned_data['price_limit']
         timing=form.cleaned_data['timing']
+        session=form.cleaned_data['session']
 
-        order_basic(company_symbol, stock_quantity, price_limit, timing)
+        order_basic(company_symbol, stock_quantity, price_limit, timing, session, tda_id)
 
         # same for all other fields, can also do form.save() if model form
 
@@ -162,12 +268,19 @@ class basic_sell_view(FormView):
 
     def form_valid(self, form):
         
+        username_query=self.request.user.username #get id of logged in user 
+
+        logged_in_user =  User.objects.get(username=username_query) #get user object
+
+        tda_id = logged_in_user.profile.tdameritrade_id #get user ameritrade id
        
         company_symbol=form.cleaned_data['sell_company_symbol']
         stock_quantity=form.cleaned_data['sell_quantity']
         price_limit=form.cleaned_data['sell_price_limit']
+        timing=form.cleaned_data['timing']
+        session=form.cleaned_data['session']
 
-        sell_basic(company_symbol, stock_quantity, price_limit)
+        sell_basic(company_symbol, stock_quantity, price_limit, timing, session, tda_id)
 
         # same for all other fields, can also do form.save() if model form
 
@@ -225,3 +338,28 @@ class options_data_view (APIView):
         return Response(options_query_object)
 
 
+class form_example_view(FormView):
+
+    # we grab the model form
+    
+   
+    template_name='form_example.html'
+
+    form_class=form_example
+
+    success_url='/home'
+
+
+    def form_valid(self, form):
+        
+        name=form.cleaned_data['name']
+        email=form.cleaned_data['email']
+
+        
+
+        # same for all other fields, can also do form.save() if model form
+
+
+        print(name, email)
+
+        return super().form_valid(form)
