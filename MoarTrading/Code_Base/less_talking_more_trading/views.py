@@ -9,13 +9,15 @@ from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .forms import(form_example, order_form_basic, sell_form_basic, options_form, options_query_form,
-    order_trigger_form, sale_trigger_form
+    order_trigger_form, sale_trigger_form, Market_Query_Form
 )
 from .order_generator import order_basic, one_order_triggers_another, options_order_single, generate_buy_equity_order
 from .sell_generator import sell_basic, generate_sell_equity_order,sale_order_triggers_another
+from .market_hours_generator import single_market_hours
 from .option_chains_generator import generate_options_calls_date, generate_options_put_date
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+import json
 
 
 # #example for how to access user profile in function based view
@@ -36,8 +38,127 @@ trial_start_date=datetime.datetime.strptime('2022-2-22', '%Y-%m-%d').date()
 trial_end_date=datetime.datetime.strptime('2022-2-22', '%Y-%m-%d').date()
 
 options_query_object=generate_options_calls_date('GOOG', 300 , trial_start_date, trial_end_date) #this will hold query data for option chains
-
+hours_query_object=single_market_hours('EQUITY',trial_end_date)#this will hold query data for market hours chains
 #setup for options query object ends here
+class Market_hours_view (APIView):
+
+    authentication_classes=[]
+    permission_classes=[]
+
+    def get(self,request, format=None):
+
+        is_open=False#tells us if the market is open
+        
+
+
+        #print(options_query_object)
+
+        # data={
+
+        #     "sales":177,
+        #     "customers":120,
+        # }
+       
+        jsonObject = list(hours_query_object.items()) #this shenanigan is supposed to extract the nested dictio i want into a json object list
+        needed_string=jsonObject[0][1]
+        jsonObject=list(needed_string.items())
+        needed_string=jsonObject[0][1]
+        jsonObject=list(needed_string.items())
+
+    
+        if(jsonObject[6][1]==True):#if the stock market is open, we know
+            is_open=True
+
+        if is_open==True: #if market is open
+            needed_string=jsonObject[7][1]
+            jsonObject=list(needed_string.items())
+
+        # for x in jsonObject:
+        #     print(x)
+
+            pre_market=jsonObject[0]
+            regular_market=jsonObject[1]
+            post_market=jsonObject[2]
+
+            title, pre_market_data=pre_market #this transfors all the data needed to a string
+
+            pre_market_data=list(pre_market)
+            pre_market_data=pre_market_data[1]
+            
+            pre_market_data=str(pre_market_data)
+
+            title, reg_market_data=regular_market
+
+            reg_market_data=list(regular_market)
+            reg_market_data=reg_market_data[1]
+            
+            reg_market_data=str(reg_market_data)
+
+            title, post_market_data=post_market
+
+            post_market_data=list(post_market)
+            post_market_data=post_market_data[1]
+            
+            post_market_data=str(post_market_data)
+            disallowed_characters="{[]}'"
+            for ch in disallowed_characters:
+                pre_market_data=pre_market_data.replace(ch,"")
+                reg_market_data=reg_market_data.replace(ch,"")
+                post_market_data=post_market_data.replace(ch,"")
+                
+
+            data=[is_open,pre_market_data,reg_market_data,post_market_data]
+
+            # print(pre_market_data)
+            
+            return render(request, 'market_hrs.html', {'data': data})
+        
+        return render(request, 'maket_closed_err.html')
+
+        
+
+class Market_Query_view(FormView):
+
+    
+
+    template_name='market_hours_query.html'
+
+    form_class=Market_Query_Form
+
+    success_url='/market_hours'
+
+
+    def form_valid(self, form):
+
+        global hours_query_object #without this python just creates a local var
+        
+
+        Market=form.cleaned_data['Market']
+        Year=form.cleaned_data['Year']#GET compay 1 daTA
+        Month=form.cleaned_data['Month']
+        Day=form.cleaned_data['Day']#GET compay 1 daTA
+        Hour=form.cleaned_data['Hour']
+        Minutes=form.cleaned_data['Minutes']#GET compay 1 daTA
+       
+        
+        date_maker = datetime.datetime(Year, Month, Day, Hour, Minutes)
+
+        hours_query_object=single_market_hours(Market, date_maker)
+
+        # print(date_maker)
+
+        
+
+    
+
+
+
+
+
+        
+
+        return super().form_valid(form)
+
 
 class sale_trigger_sale_view(FormView):
 
