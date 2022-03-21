@@ -5,6 +5,17 @@ from crispy_forms.helper import FormHelper
 
 Exaxmple_Choices=[('question', 'Question'), ('other','Other')]
 
+class Movers_Query_Form(forms.Form):
+    change_choice=[('VALUE', 'VALUE'), ('PERCENT','PERCENT')]
+    direction_choice=[('UP', 'UP'), ('DOWN','DOWN')]
+    market_choice=[('$COMPX','NASDAQ COMPOSITE'), ('$DJI','DOW JONE'), ('$SPX.X','S&P 500')]
+
+
+    index= forms.ChoiceField(label="Market", choices=market_choice)
+    change = forms.ChoiceField(label="Type of change", choices=change_choice)
+    direction= forms.ChoiceField(label="Which direction?", choices=direction_choice)
+
+    
 class Market_Query_Form(forms.Form):
 
     market_choice=[('EQUITY', 'EQUITY'), ('OPTION','OPTION'), ('FUTURE','FUTURE'), 

@@ -1,6 +1,7 @@
 from asyncio.windows_events import NULL
 import datetime
 import email
+from pickle import NONE
 from this import d
 from django.shortcuts import render
 from django.views.generic import View
@@ -9,7 +10,7 @@ from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .forms import(form_example, order_form_basic, sell_form_basic, options_form, options_query_form,
-    order_trigger_form, sale_trigger_form, Market_Query_Form
+    order_trigger_form, sale_trigger_form, Market_Query_Form, Movers_Query_Form
 )
 from .order_generator import order_basic, one_order_triggers_another, options_order_single, generate_buy_equity_order
 from .sell_generator import sell_basic, generate_sell_equity_order,sale_order_triggers_another
@@ -17,6 +18,7 @@ from .market_hours_generator import single_market_hours
 from .option_chains_generator import generate_options_calls_date, generate_options_put_date
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from .movers_generator import get_movers
 import json
 
 
@@ -39,7 +41,70 @@ trial_end_date=datetime.datetime.strptime('2022-2-22', '%Y-%m-%d').date()
 
 options_query_object=generate_options_calls_date('GOOG', 300 , trial_start_date, trial_end_date) #this will hold query data for option chains
 hours_query_object=single_market_hours('EQUITY',trial_end_date)#this will hold query data for market hours chains
+movers_query_obj=NONE
 #setup for options query object ends here
+
+class Movers_data_view (APIView):
+
+    authentication_classes=[]
+    permission_classes=[]
+
+    def get(self,request, format=None):
+
+        
+       
+        # jsonObject = list(movers_query_obj.items()) #this shenanigan is supposed to extract the nested dictio i want into a json object list
+        # needed_string=jsonObject[0][1]
+        # jsonObject=list(needed_string.items())
+        # needed_string=jsonObject[0][1]
+        # jsonObject=list(needed_string.items())
+
+    
+        # for x in jsonObject:
+        return Response(movers_query_obj)    #     print(x)
+
+          
+
+class Movers_Query_view(FormView):
+
+    
+
+    template_name='movers_query.html'
+
+    form_class=Movers_Query_Form
+
+    success_url='/movers_data'
+
+
+    def form_valid(self, form):
+
+        global movers_query_obj
+
+        global hours_query_object #without this python just creates a local var
+        
+
+        index=form.cleaned_data['index']
+        direction=form.cleaned_data['direction']#GET compay 1 daTA
+        change=form.cleaned_data['change']
+       
+       
+       
+
+        movers_query_obj=get_movers(index,direction,change)
+
+        # print(index)
+
+    
+
+
+
+
+
+        
+
+        return super().form_valid(form)
+
+
 class Market_hours_view (APIView):
 
     authentication_classes=[]
