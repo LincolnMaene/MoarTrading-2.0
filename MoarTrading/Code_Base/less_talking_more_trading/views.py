@@ -76,11 +76,31 @@ class Movers_data_view (APIView): #this should give the user the top ten movers 
             Movers_data_view.list_of_descriptions[x]=str(Movers_data_view.list_of_descriptions[x])
        
        
-       #by the time we reach here, i have converted the symbols and company names into usable strings for html
+        #by the time we reach here, i have converted the symbols and company names into usable strings for html
 
-        print(Movers_data_view.list_of_symbols)
-        # for x in jsonObject:
-        return Response(movers_query_obj)    #     print(x)
+        #print(Movers_data_view.list_of_symbols)
+        # for x in jsonObject:#     print(x)
+
+        disallowed_substr="['description', '"
+        disallowed_substr2="']"
+        disallowed_substr3="['symbol', '"
+        
+        for x in range(0, 10):
+
+            Movers_data_view.list_of_symbols[x]=Movers_data_view.list_of_symbols[x].replace(disallowed_substr3, "")
+            Movers_data_view.list_of_symbols[x]=Movers_data_view.list_of_symbols[x].replace(disallowed_substr2, "")
+            Movers_data_view.list_of_descriptions[x]=Movers_data_view.list_of_descriptions[x].replace(disallowed_substr, "")
+            Movers_data_view.list_of_descriptions[x]=Movers_data_view.list_of_descriptions[x].replace(disallowed_substr2, "")
+
+        range_html=[0,1,2,3,4,5]
+
+        compact_list=zip(Movers_data_view.list_of_descriptions, Movers_data_view.list_of_symbols)
+
+
+
+
+        return render(request, 'movers_display.html', 
+            {'description': compact_list })
 
           
 
