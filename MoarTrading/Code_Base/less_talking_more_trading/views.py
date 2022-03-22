@@ -44,22 +44,41 @@ hours_query_object=single_market_hours('EQUITY',trial_end_date)#this will hold q
 movers_query_obj=NONE
 #setup for options query object ends here
 
-class Movers_data_view (APIView):
+class Movers_data_view (APIView): #this should give the user the top ten movers for that day and so on and so forth
 
     authentication_classes=[]
     permission_classes=[]
 
+    list_of_lists=[[]] * 10
+
+    list_of_descriptions=[[]] * 10
+
+    list_of_symbols=[[]] * 10
+
     def get(self,request, format=None):
-
         
-       
-        # jsonObject = list(movers_query_obj.items()) #this shenanigan is supposed to extract the nested dictio i want into a json object list
-        # needed_string=jsonObject[0][1]
-        # jsonObject=list(needed_string.items())
-        # needed_string=jsonObject[0][1]
-        # jsonObject=list(needed_string.items())
 
-    
+        for x in range(0, 10):
+
+            Movers_data_view.list_of_lists[x]=list(movers_query_obj[x].items())
+
+        for x in range(0, 10):
+
+            Movers_data_view.list_of_descriptions[x]=list(Movers_data_view.list_of_lists[x][1])
+
+        for x in range(0, 10):
+
+            Movers_data_view.list_of_symbols[x]=list(Movers_data_view.list_of_lists[x][4])
+
+        for x in range(0, 10):
+
+            Movers_data_view.list_of_symbols[x]=str(Movers_data_view.list_of_symbols[x])
+            Movers_data_view.list_of_descriptions[x]=str(Movers_data_view.list_of_descriptions[x])
+       
+       
+       #by the time we reach here, i have converted the symbols and company names into usable strings for html
+
+        print(Movers_data_view.list_of_symbols)
         # for x in jsonObject:
         return Response(movers_query_obj)    #     print(x)
 
