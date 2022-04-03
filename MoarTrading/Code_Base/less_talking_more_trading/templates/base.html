@@ -43,6 +43,9 @@
     </head>
 
     <body>
+
+        {% block scripts %}  {% endblock scripts %}
+
         {% block base_body %}
         <div class="card" style="width: 18rem;">
             <img src="..." class="card-img-top" alt="...">
@@ -54,6 +57,6 @@
           </div>
           
         <p>This is an example of a simple HTML page with one paragraph.</p>
-        {% endblock %}
+        {% endblock base_body %}
     </body>
 </html>

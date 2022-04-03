@@ -4,7 +4,7 @@ import email
 from pickle import NONE
 from this import d
 from django.shortcuts import render
-from django.views.generic import View
+from django.views.generic import View, TemplateView
 from django.views.generic.edit import FormView
 from django.http import JsonResponse
 from rest_framework.views import APIView
@@ -20,6 +20,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from .movers_generator import get_movers
 import json
+import jsonpickle
 
 
 # #example for how to access user profile in function based view
@@ -43,6 +44,23 @@ options_query_object=generate_options_calls_date('GOOG', 300 , trial_start_date,
 hours_query_object=single_market_hours('EQUITY',trial_end_date)#this will hold query data for market hours chains
 movers_query_obj=NONE
 #setup for options query object ends here
+
+
+class Club_chart_view(TemplateView):##this is just me learning how to use chart.js, templateview class
+
+    template_name="chart.html"
+
+    
+
+    def get_context_data(self, **kwargs):
+        data_set=[5,5,8,15,3,7]
+        context=super().get_context_data(**kwargs)
+        context["qs"]=jsonpickle.encode(data_set)#we need to serialize to json otherwise it's all strings, impossible to work with
+        context["len"]=6
+
+        #print(context["qs"])
+        return context
+
 
 class Movers_data_view (APIView): #this should give the user the top ten movers for that day and so on and so forth
 
@@ -144,7 +162,7 @@ class Movers_Query_view(FormView):
         return super().form_valid(form)
 
 
-class Market_hours_view (APIView):
+class Market_hours_view (APIView):#!!!! CHECK FORMAT FOR FOREX, BONDS ETC...!!!!
 
     authentication_classes=[]
     permission_classes=[]
