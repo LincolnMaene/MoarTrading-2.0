@@ -5,6 +5,10 @@ from crispy_forms.helper import FormHelper
 
 Exaxmple_Choices=[('question', 'Question'), ('other','Other')]
 
+class Price_Query_Form(forms.Form):
+    symbol=forms.CharField(label="Company Symbol")
+    
+
 class Movers_Query_Form(forms.Form):
     change_choice=[('VALUE', 'VALUE'), ('PERCENT','PERCENT')]
     direction_choice=[('UP', 'UP'), ('DOWN','DOWN')]

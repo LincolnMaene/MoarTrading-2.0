@@ -10,12 +10,13 @@ from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .forms import(form_example, order_form_basic, sell_form_basic, options_form, options_query_form,
-    order_trigger_form, sale_trigger_form, Market_Query_Form, Movers_Query_Form
+    order_trigger_form, sale_trigger_form, Market_Query_Form, Movers_Query_Form,Price_Query_Form
 )
 from .order_generator import order_basic, one_order_triggers_another, options_order_single, generate_buy_equity_order
 from .sell_generator import sell_basic, generate_sell_equity_order,sale_order_triggers_another
 from .market_hours_generator import single_market_hours
 from .option_chains_generator import generate_options_calls_date, generate_options_put_date
+from .price_history_generator import get_daily_price_history 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from .movers_generator import get_movers
@@ -39,11 +40,136 @@ import jsonpickle
 #these lines essentiall fill the options_query object with junk data so function knows what type it is
 trial_start_date=datetime.datetime.strptime('2022-2-22', '%Y-%m-%d').date()
 trial_end_date=datetime.datetime.strptime('2022-2-22', '%Y-%m-%d').date()
+price_history_str=""
+
 
 options_query_object=generate_options_calls_date('GOOG', 300 , trial_start_date, trial_end_date) #this will hold query data for option chains
 hours_query_object=single_market_hours('EQUITY',trial_end_date)#this will hold query data for market hours chains
 movers_query_obj=NONE
 #setup for options query object ends here
+
+class Price_history_query_view(FormView):
+
+    template_name='price_query.html'
+
+    form_class=Price_Query_Form
+
+    success_url='/price_history'
+
+
+    def form_valid(self, form):
+
+        username_query=self.request.user.username #get id of logged in user 
+
+        logged_in_user =  User.objects.get(username=username_query) #get user object
+
+        tda_id = logged_in_user.profile.tdameritrade_id #get user ameritrade id
+        
+        symbol=form.cleaned_data['symbol']
+      
+        price_list = []
+        #print(underlying_symbol, expiration_date, contract_type, strike_price_as_string)
+
+        response=get_daily_price_history(symbol, price_list)
+
+        #the goal is to split the price hisotry string so as to have nothign but the raw numerical data (high point each week)
+        split_str=response.split()
+
+        empty_string = ""
+
+        index_str=0
+
+        for item in split_str:
+
+            
+
+            str_check='"high":'
+
+            #print(item)
+
+            if item==str_check:
+                #print(item)
+                empty_string=empty_string+split_str[index_str+1]
+                #print(split_str[index_str])
+                #print(split_str[index_str+1])
+
+            index_str=index_str+1
+
+        final_split=empty_string.split(',')
+
+        global price_history_str
+
+        price_history_str=final_split
+
+
+        #print(price_history_str)
+        # same for all other fields, can also do form.save() if model form
+
+
+
+
+
+        
+
+        return super().form_valid(form)
+
+class price_history_view(TemplateView):##this is just me learning how to use chart.js, templateview class
+
+    template_name="price_history.html"
+
+    
+
+    
+
+    def get_context_data(self, **kwargs):
+        global price_history_str
+        price_len=len(price_history_str)#this tells us the lenght of the price history list
+        #print(price_len)
+
+        raw_data_arr=[0] * (price_len-1)
+
+        #print(raw_data_arr)
+
+        data_index=0
+        #we convert the string of prices to an array
+        for price in price_history_str:
+
+            if price!="":
+                int_price=float(price)
+                #print(int_price)
+                raw_data_arr[data_index]=float(price)
+
+            data_index=data_index+1
+
+        #print(raw_data_arr)
+
+        #we need to create some kind of labels for the graph
+        labels=[''] * data_index
+
+        #print(labels)
+        label_index=0
+        for label in labels:
+
+            label=str(data_index)
+
+            labels[label_index]=label
+
+            data_index=data_index-1
+            label_index=label_index+1
+
+        print(labels)
+
+        #labels=['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange', 'extra']
+
+        data_set= raw_data_arr
+        context=super().get_context_data(**kwargs)
+        context["qs"]=jsonpickle.encode(data_set)#we need to serialize to json otherwise it's all strings, impossible to work with
+        context["len"]=price_len
+        context["labels"]=jsonpickle.encode(labels)
+
+        #print(context["labels"])
+        return context
+
 
 
 class Club_chart_view(TemplateView):##this is just me learning how to use chart.js, templateview class

@@ -8,7 +8,7 @@
 
         {% endblock %}
 
-        {% block base_title %}<title>Club Chart</title>{% endblock %} 
+        {% block base_title %}<title>Price History</title>{% endblock %} 
         
        
 
@@ -16,13 +16,18 @@
        
         <script>
             var data_set = [1, 2, 3, 4];
+            var get_labels=['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange']
+
             data_set = '{{ qs|escapejs }}';
 
             var arrayLength = '{{ len|escapejs }}';
+
+            get_labels='{{ labels|escapejs }}';
             
             var data_set_parsed = jQuery.parseJSON(data_set);
+            var labels_parsed = jQuery.parseJSON(get_labels);
 
-            console.log(data_set_parsed);
+            console.log(get_labels);
 
          </script>
  
@@ -34,7 +39,7 @@
                 const myChart = new Chart(ctx, {
                     type: 'line',
                     data: {
-                        labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+                        labels: labels_parsed,
                         datasets: [{
                             label: '# of Votes',
                             data: data_set_parsed,

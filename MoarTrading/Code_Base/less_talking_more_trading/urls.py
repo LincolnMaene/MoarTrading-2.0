@@ -19,7 +19,7 @@ from less_talking_more_trading.views import home_view
 from less_talking_more_trading.views import data_test_view
 from less_talking_more_trading.views import form_example_view, basic_order_view, basic_sell_view, options_view, options_query_view
 from less_talking_more_trading.views import (options_data_view, order_trigger_order_view, sale_trigger_sale_view, Market_Query_view,
-    Market_hours_view, Movers_Query_view, Movers_data_view, Club_chart_view)
+    Market_hours_view, Movers_Query_view, Movers_data_view, Club_chart_view, price_history_view, Price_history_query_view)
 from django.contrib.auth.decorators import login_required                                     
 
 urlpatterns = [
@@ -29,12 +29,14 @@ urlpatterns = [
     path('form_example/', form_example_view.as_view(), name='form_example'),
     path('order_trigger_order/',  login_required(order_trigger_order_view.as_view()), name='order_trigger_order'),
     path('club_chart/',  login_required(Club_chart_view.as_view()), name='club_chart'),
+    path('price_history/',  login_required(price_history_view.as_view()), name='price_history'),
     path('sale_trigger_sale/',  login_required(sale_trigger_sale_view.as_view()), name='sale_trigger_sale'),
     path('market_hours_query/',  login_required(Market_Query_view.as_view()), name='market_hours_query'),
     path('movers_query/',  login_required(Movers_Query_view.as_view()), name='movers_query'),
     path('basic_order/', login_required(basic_order_view.as_view()), name='basic_order'),
     path('options_order/', login_required(options_view.as_view()), name='options_order'),
     path('options_query/', login_required(options_query_view.as_view()), name='options_query'),
+    path('price_query/', login_required(Price_history_query_view.as_view()), name='price_query'),
     path('options_data/', login_required(options_data_view.as_view()), name='options_data'),
     path('market_hours/', login_required(Market_hours_view.as_view()), name='market_hours'),
     path('movers_data/', login_required(Movers_data_view.as_view()), name='movers_data'),
