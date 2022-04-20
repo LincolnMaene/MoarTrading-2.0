@@ -5,6 +5,22 @@ from crispy_forms.helper import FormHelper
 
 Exaxmple_Choices=[('question', 'Question'), ('other','Other')]
 
+
+class Watchlist_query_form(forms.Form):
+ 
+    name= forms.CharField()
+    symbol= forms.CharField()
+    date = forms.CharField(label="Date (Y-m-d)")
+    quantity=forms.IntegerField()
+    price_avg=forms.DecimalField()
+    commission=forms.DecimalField()
+   
+    
+
+class Quote_Query_Form(forms.Form):
+    symbol=forms.CharField(label="Company Symbol")
+    
+
 class Price_Query_Form(forms.Form):
     symbol=forms.CharField(label="Company Symbol")
     

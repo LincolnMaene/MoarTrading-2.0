@@ -9,9 +9,13 @@ from django.views.generic.edit import FormView
 from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
+
+from .quote_generator import generate_quote
 from .forms import(form_example, order_form_basic, sell_form_basic, options_form, options_query_form,
-    order_trigger_form, sale_trigger_form, Market_Query_Form, Movers_Query_Form,Price_Query_Form
+    order_trigger_form, sale_trigger_form, Market_Query_Form, Movers_Query_Form,Price_Query_Form,Quote_Query_Form,
+    Watchlist_query_form
 )
+from .watchlist_generator import create_watchlist_spec_equity, generate_watchlist
 from .order_generator import order_basic, one_order_triggers_another, options_order_single, generate_buy_equity_order
 from .sell_generator import sell_basic, generate_sell_equity_order,sale_order_triggers_another
 from .market_hours_generator import single_market_hours
@@ -46,7 +50,193 @@ price_history_str=""
 options_query_object=generate_options_calls_date('GOOG', 300 , trial_start_date, trial_end_date) #this will hold query data for option chains
 hours_query_object=single_market_hours('EQUITY',trial_end_date)#this will hold query data for market hours chains
 movers_query_obj=NONE
+stock_quote_obj=NONE
 #setup for options query object ends here
+
+
+class Watchlist_query_view(FormView):
+
+    template_name='watchlist_query.html'
+
+    form_class=Watchlist_query_form
+
+    success_url='/home'
+
+
+    def form_valid(self, form):
+
+        username_query=self.request.user.username #get id of logged in user 
+
+        logged_in_user =  User.objects.get(username=username_query) #get user object
+
+        tda_id = logged_in_user.profile.tdameritrade_id #get user ameritrade id
+        
+        symbol=form.cleaned_data['symbol']
+        name=form.cleaned_data['name']
+        date=form.cleaned_data['date']
+        quantity=form.cleaned_data['quantity']
+        price_avg=form.cleaned_data['price_avg']
+        commission=form.cleaned_data['commission']
+
+        real_date=datetime.datetime.strptime(date, '%Y-%m-%d').date()
+
+      
+      
+      
+        spec=create_watchlist_spec_equity(name,quantity,price_avg,commission,symbol,date)
+
+        # print(spec)
+
+        # print(tda_id)
+
+        print(generate_watchlist(tda_id,spec))
+
+
+
+
+
+        
+
+        return super().form_valid(form)
+
+class Quote_view(TemplateView):##this displayds the price history
+
+    template_name="stock_quote.html"
+
+    
+
+    
+
+    def get_context_data(self, **kwargs):
+        global stock_quote_obj
+        price_len=len(price_history_str)#this tells us the lenght of the price history list
+        
+       
+        context=super().get_context_data(**kwargs)
+        context["quote_data"]=stock_quote_obj#we need to serialize to json otherwise it's all strings, impossible to work with
+        context["len"]=price_len
+       
+
+        #print(context["labels"])
+        return context
+
+
+class Quote_query_view(FormView):
+
+    template_name='quote_query.html'
+
+    form_class=Quote_Query_Form
+
+    success_url='/stock_quote'
+
+
+    def form_valid(self, form):
+
+        global stock_quote_obj
+
+        username_query=self.request.user.username #get id of logged in user 
+
+        logged_in_user =  User.objects.get(username=username_query) #get user object
+
+        tda_id = logged_in_user.profile.tdameritrade_id #get user ameritrade id
+        
+        symbol=form.cleaned_data['symbol']
+      
+        #price_list = []
+        #print(underlying_symbol, expiration_date, contract_type, strike_price_as_string)
+        response = generate_quote(symbol)
+
+        disallowed_substr="{[, '"
+
+        #print(response)
+
+        #response=generate_quote(symbol)
+
+        # the goal is to split the price hisotry string so as to have nothign but the raw numerical data (high point each week)
+        
+        
+        split_str=response.split()
+
+        empty_string = ""
+
+        index_str=0
+        #print(split_str)
+        for item in split_str: #this allowes me to pick for data i want  from string above
+
+            
+
+            bidprice='"bidPrice":'
+            askprice='"askPrice":'
+            openprice='"openPrice":'
+            highprice='"highPrice":'
+            lowprice='"lowPrice":'
+            closeprice='"closePrice":'
+          
+
+            #print(item)
+
+            if item==bidprice:
+                #print(item)
+                empty_string=empty_string+split_str[index_str+1]
+                #print(split_str[index_str])
+                #print(split_str[index_str+1])
+            elif item==askprice:
+                #print(item)
+                empty_string=empty_string+split_str[index_str+1]
+                #print(split_str[index_str])
+                #print(split_str[index_str+1])
+            elif item==openprice:
+                #print(item)
+                empty_string=empty_string+split_str[index_str+1]
+                #print(split_str[index_str])
+                #print(split_str[index_str+1])
+
+            elif item==highprice:
+                #print(item)
+                empty_string=empty_string+split_str[index_str+1]
+                #print(split_str[index_str])
+                #print(split_str[index_str+1])
+
+            elif item==lowprice:
+                #print(item)
+                empty_string=empty_string+split_str[index_str+1]
+                #print(split_str[index_str])
+                #print(split_str[index_str+1])
+            elif item==closeprice:
+                #print(item)
+                empty_string=empty_string+split_str[index_str+1]
+                #print(split_str[index_str])
+                #print(split_str[index_str+1])
+
+            index_str=index_str+1
+
+
+     
+
+
+        empty_string=empty_string.split(',')
+
+        # print(empty_string[0])
+
+        
+        stock_quote_obj=empty_string
+        
+
+        # same for all other fields, can also do form.save() if model form
+
+
+
+
+
+        
+
+        return super().form_valid(form)
+
+# class price_history_view(TemplateView):##this is just me learning how to use chart.js, templateview class
+
+#     template_name="price_history.html"
+
+    
 
 class Price_history_query_view(FormView):
 
@@ -113,7 +303,7 @@ class Price_history_query_view(FormView):
 
         return super().form_valid(form)
 
-class price_history_view(TemplateView):##this is just me learning how to use chart.js, templateview class
+class price_history_view(TemplateView):##this displayds the price history
 
     template_name="price_history.html"
 
