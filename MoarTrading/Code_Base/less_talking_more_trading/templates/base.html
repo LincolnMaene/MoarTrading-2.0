@@ -17,8 +17,37 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js" integrity="sha512-TW5s0IT/IppJtu76UbysrBH9Hy/5X41OTAbQuffZFU6lQ1rdcLHzpU5BzVvr/YFykoiMYZVWlr/PX1mDcfM9Qg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
    
 
-
-
+  
+    <nav class="navbar navbar-default">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#">Moartrading</a>
+        </div>
+        <ul class="nav navbar-nav">
+          <li class="active"><a href="/home">Home</a></li>
+          {% if user.is_authenticated %}
+          <li><a href="/logout">Logout</a></li>
+          <li><a href="/profile_update">Update Profile</a></li>
+          <li><a href="/basic_order">Buy Stocks</a></li>
+          <li><a href="/sell_basic">Sell Stocks</a></li>
+          <li><a href="/quote_query">Stock Quotes</a></li>
+          <li><a href="/options_query">Search Options Symbols</a></li>
+          <li><a href="/options_order">Buy Options</a></li>
+          <li><a href="/movers_query">See Movers</a></li>
+          <li><a href="/watchlist_query">Create Stock Watchlist</a></li>
+          <li><a href="/market_hours_query">Market Hours</a></li>
+          <li><a href="/sale_trigger_sale">Complex Stock Sales</a></li>
+          <li><a href="/order_trigger_order">Complex Stock Purchase</a></li>
+          <li><a href="/price_query">Price History</a></li>
+      
+          {% else %}
+      
+          <li><a href="/sign_up">Account Creation</a></li>
+          <li><a href="/login">Login</a></li>
+          {% endif %}
+        </ul>
+      </div>
+    </nav>
 
 <html>
     <head> 
@@ -47,16 +76,7 @@
         {% block scripts %}  {% endblock scripts %}
 
         {% block base_body %}
-        <div class="card" style="width: 18rem;">
-            <img src="..." class="card-img-top" alt="...">
-            <div class="card-body">
-              <h5 class="card-title">Card title</h5>
-              <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-              <a href="#" class="btn btn-primary">Go somewhere</a>
-            </div>
-          </div>
-          
-        <p>This is an example of a simple HTML page with one paragraph.</p>
+        
         {% endblock base_body %}
     </body>
 </html>

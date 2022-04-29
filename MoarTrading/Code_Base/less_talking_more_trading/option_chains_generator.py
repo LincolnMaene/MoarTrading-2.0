@@ -31,8 +31,8 @@ def generate_options_put_strike(stock_symbol, strike_number):#takes in stock sym
 
 def generate_options_calls_date(stock_symbol, strike_number, date_from, date_to):#takes in stock symbol and returns call stock options json, format is yy-m-d
   response = client_local.get_option_chain(stock_symbol, contract_type=client_local.Options.ContractType.CALL, strike=strike_number, from_date=date_from, to_date=date_to) # get quotes for Boeing company
-  return response.json()
+  return json.dumps(response.json())
 
 def generate_options_put_date(stock_symbol, strike_number,  date_from, date_to):#takes in stock symbol and returns put stock options json format is yy-m-d
   response = client_local.get_option_chain(stock_symbol, contract_type=client_local.Options.ContractType.PUT, strike=strike_number, from_date=date_from, to_date=date_to) # get quotes for Boeing company
-  return response.json()
+  return json.dumps(response.json())

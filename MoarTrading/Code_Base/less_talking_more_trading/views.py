@@ -47,7 +47,7 @@ trial_end_date=datetime.datetime.strptime('2022-2-22', '%Y-%m-%d').date()
 price_history_str=""
 
 
-options_query_object=generate_options_calls_date('GOOG', 300 , trial_start_date, trial_end_date) #this will hold query data for option chains
+options_query_object=NONE #this will hold query data for option chains
 hours_query_object=single_market_hours('EQUITY',trial_end_date)#this will hold query data for market hours chains
 movers_query_obj=NONE
 stock_quote_obj=NONE
@@ -880,21 +880,72 @@ class data_test_view (APIView):
         return Response(data)
 
 
-class options_data_view (APIView):
+class options_data_view (APIView): #this allows us to see  option data
 
     authentication_classes=[]
     permission_classes=[]
 
+    
+
     def get(self,request, format=None):
 
-        #print(options_query_object)
+        global options_query_object #the plan is to take string returned by function them extract symbols
 
-        # data={
+        data1=""
+        data2=""
+        data3=""
+        data4=""
 
-        #     "sales":177,
-        #     "customers":120,
-        # }
-        return Response(options_query_object)
+        options_query_object=options_query_object.split(",")
+
+        for item in options_query_object:
+
+            if item.find("symbol")!=-1:
+               data1=data1+item
+
+        data1=data1.split(":")
+        disallowed_substr1="{\""
+        disallowed_substr2="\""
+        disallowed_substr3="symbol"
+
+        for item in data1:
+            item=item.replace(disallowed_substr1, "")
+            item=item.replace(disallowed_substr2, ",")
+            item=item.replace(disallowed_substr3, "")
+            
+            data2=data2+item
+        
+        data2=data2.split(",")
+        index=0
+        for item in data2:
+
+            if(item!="" and item!=''):
+                data3=data3+item
+                
+
+            index=index+1
+
+        data3=data3.split(" ")
+
+        
+        for item in data3:
+            if not item:
+               item="x"
+            else:
+                data4=data4+item+","
+        
+        data4=data4.split(",")
+            
+
+
+                
+            
+            
+            
+           
+        
+        #print(data4)
+        return render(request, 'options_symbols.html', {'data': data4})
 
 
 class form_example_view(FormView):
