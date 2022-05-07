@@ -10,7 +10,7 @@
 
         {% block base_title %}<title>Price History</title>{% endblock %} 
         
-       
+        {% block base_body %}
 
         {% block scripts %} 
        
@@ -80,10 +80,28 @@
 
 
 
-        {% block base_body %}
+    
+
+
+        <body>
+
+    
+
+           
+
+            <canvas id="myChart" width="400" height="400"></canvas>
+    
+           
+            
+         
+    
+    
+         
+    
+        </body>
        
         <!-- <h3>context: {{qs.3}}</h3>  -->
-        <canvas id="myChart" width="400" height="400"></canvas>
+        
 
         
         {% endblock base_body %}

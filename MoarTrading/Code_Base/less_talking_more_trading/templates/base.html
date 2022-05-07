@@ -1,5 +1,5 @@
 {% load static %}
-
+<link rel="stylesheet" href="{% static 'less_talking_more_trading/style.css' %}" />
 
 
 <!DOCTYPE html>
@@ -17,7 +17,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js" integrity="sha512-TW5s0IT/IppJtu76UbysrBH9Hy/5X41OTAbQuffZFU6lQ1rdcLHzpU5BzVvr/YFykoiMYZVWlr/PX1mDcfM9Qg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
    
 
-  
+    {% block navbar %}
     <nav class="navbar navbar-default">
       <div class="container-fluid">
         <div class="navbar-header">
@@ -39,7 +39,8 @@
           <li><a href="/sale_trigger_sale">Complex Stock Sales</a></li>
           <li><a href="/order_trigger_order">Complex Stock Purchase</a></li>
           <li><a href="/price_query">Price History</a></li>
-      
+         
+          <li><a href="/logout">Logout</a></li>
           {% else %}
       
           <li><a href="/sign_up">Account Creation</a></li>
@@ -50,6 +51,8 @@
     </nav>
 
 <html>
+
+{% endblock %}
     <head> 
  
      <!-- having these blocks allow overredide in child pages -->
@@ -70,13 +73,20 @@
         {% block base_title %}<title>Default Title</title>{% endblock %} 
         
     </head>
-
+    {% block base_body %}
     <body>
+
+    
 
         {% block scripts %}  {% endblock scripts %}
 
-        {% block base_body %}
+       
         
-        {% endblock base_body %}
+     
+
+
+     
+
     </body>
+    {% endblock base_body %}
 </html>

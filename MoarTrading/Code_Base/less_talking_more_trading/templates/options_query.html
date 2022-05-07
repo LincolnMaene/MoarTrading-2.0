@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
 {% crispy form form.helper %}
-
+{% load static %}
 
 <html>
     <head> 
@@ -14,9 +14,9 @@
         {% block base_title %}<title>Options Query</title>{% endblock %} 
         
     </head>
-
-    <body>
-        {% block base_body %}
+    {% block base_body %}
+    <body id="bg3" style="background-image: url('{% static "less_talking_more_trading/images/6.jpg"%}')";>
+       
        
         <form action="." method="post" class="contact-form" style="margin: auto; width: 220px;">
             
@@ -24,12 +24,14 @@
             
             {{ form | crispy }}
 
-            <button type="submit">Search</button>
+            <button type="submit">Search Option Symbols</button>
 
 
         </form>
           
-        
-        {% endblock %}
+         
     </body>
+
+    {% endblock %}
+       
 </html>

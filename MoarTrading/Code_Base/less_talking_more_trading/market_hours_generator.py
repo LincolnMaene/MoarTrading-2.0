@@ -10,4 +10,4 @@ def single_market_hours(Market, Date):
 
 
 
-    return(response.json())
+    return json.dumps(response.json())

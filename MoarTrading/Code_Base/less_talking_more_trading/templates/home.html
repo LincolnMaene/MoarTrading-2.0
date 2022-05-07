@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load static %}
 
 
       
@@ -23,15 +23,16 @@
     
     </head>
 
-
-    <body>
-      {% block base_body %}
+    {% block base_body %}
+    <body id="bg" style="background-image: url('{% static "less_talking_more_trading/images/1.jpg"%}')";>
+     
 
      
       
       
      
         
-      {% endblock base_body %}
+     
     </body>
+    {% endblock base_body %}
 </html>

@@ -19,10 +19,19 @@
     <body>
      
         {% block base_body %}
+
+        {% if nothing %}
+        
+        <h3> No Movers found today </h3>
+
+        {% else %}
+
+      
         {% for name, symbol in description %}
             <h3> {{ name }} ( {{ symbol }}) </h3>
         {% endfor %}
         
+        {% endif %}
                   
 
         

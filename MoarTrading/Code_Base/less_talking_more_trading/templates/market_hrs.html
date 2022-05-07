@@ -19,10 +19,13 @@
     <body>
      
         {% block base_body %}
+
+
+        {% for item in data %}
+            <h3> {{item}}</h3>
+        {% endfor %}
        
-        <h3>Pre-Market Hours: {{ data.1 }}</h3>
-        <h3>Regular Market Hours: {{ data.2 }}</h3>
-        <h3>Post Market Hours: {{ data.3 }}</h3>
+      
                   
 
         

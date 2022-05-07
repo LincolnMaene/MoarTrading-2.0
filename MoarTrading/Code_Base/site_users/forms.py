@@ -1,3 +1,5 @@
+from cProfile import label
+from tkinter.ttk import Style
 from unicodedata import category
 from django import forms
 from crispy_forms.helper import FormHelper
@@ -29,7 +31,7 @@ class LoginForm(forms.Form):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    tdameritrade_id = models.IntegerField(default=00000000000)
+    tdameritrade_id = models.IntegerField("Please Enter TDAmeritrade ID:", default=00000000000)
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
@@ -47,3 +49,7 @@ class UpdateProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = ('tdameritrade_id',)
+        #labels = {
+        #"tdameritrade_id": "Please Enter TDAmeritrade ID"
+        #}
+        

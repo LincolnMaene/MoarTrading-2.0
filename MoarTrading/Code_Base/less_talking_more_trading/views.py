@@ -1,5 +1,6 @@
 from asyncio.windows_events import NULL
 import datetime
+import re
 import email
 from pickle import NONE
 from this import d
@@ -389,52 +390,76 @@ class Movers_data_view (APIView): #this should give the user the top ten movers 
 
     list_of_symbols=[[]] * 10
 
+    
+
+    
+
+   
+
     def get(self,request, format=None):
+        nothing_found=1
+
+        print("!!!!!type of movers query object is:", type(movers_query_obj))
+
+        print("!!!!!size of movers query object is:", len(movers_query_obj))
+
+        size=10
+
+        if(len(movers_query_obj)>0):
+
+            nothing_found=0
+
+            print("size greater than zero")
+
+            for x in range(0, size):
+
+                Movers_data_view.list_of_lists[x]=list(movers_query_obj[x].items())
+
+            for x in range(0, size):
+
+                Movers_data_view.list_of_descriptions[x]=list(Movers_data_view.list_of_lists[x][1])
+
+            for x in range(0, size):
+
+                Movers_data_view.list_of_symbols[x]=list(Movers_data_view.list_of_lists[x][4])
+
+            for x in range(0, size):
+
+                Movers_data_view.list_of_symbols[x]=str(Movers_data_view.list_of_symbols[x])
+                Movers_data_view.list_of_descriptions[x]=str(Movers_data_view.list_of_descriptions[x])
         
-
-        for x in range(0, 10):
-
-            Movers_data_view.list_of_lists[x]=list(movers_query_obj[x].items())
-
-        for x in range(0, 10):
-
-            Movers_data_view.list_of_descriptions[x]=list(Movers_data_view.list_of_lists[x][1])
-
-        for x in range(0, 10):
-
-            Movers_data_view.list_of_symbols[x]=list(Movers_data_view.list_of_lists[x][4])
-
-        for x in range(0, 10):
-
-            Movers_data_view.list_of_symbols[x]=str(Movers_data_view.list_of_symbols[x])
-            Movers_data_view.list_of_descriptions[x]=str(Movers_data_view.list_of_descriptions[x])
-       
-       
-        #by the time we reach here, i have converted the symbols and company names into usable strings for html
-
-        #print(Movers_data_view.list_of_symbols)
-        # for x in jsonObject:#     print(x)
-
-        disallowed_substr="['description', '"
-        disallowed_substr2="']"
-        disallowed_substr3="['symbol', '"
         
-        for x in range(0, 10):
+            #by the time we reach here, i have converted the symbols and company names into usable strings for html
 
-            Movers_data_view.list_of_symbols[x]=Movers_data_view.list_of_symbols[x].replace(disallowed_substr3, "")
-            Movers_data_view.list_of_symbols[x]=Movers_data_view.list_of_symbols[x].replace(disallowed_substr2, "")
-            Movers_data_view.list_of_descriptions[x]=Movers_data_view.list_of_descriptions[x].replace(disallowed_substr, "")
-            Movers_data_view.list_of_descriptions[x]=Movers_data_view.list_of_descriptions[x].replace(disallowed_substr2, "")
+            #print(Movers_data_view.list_of_symbols)
+            # for x in jsonObject:#     print(x)
 
-        range_html=[0,1,2,3,4,5]
+            disallowed_substr="['description', '"
+            disallowed_substr2="']"
+            disallowed_substr3="['symbol', '"
+            
+            for x in range(0, size):
 
-        compact_list=zip(Movers_data_view.list_of_descriptions, Movers_data_view.list_of_symbols)
+                Movers_data_view.list_of_symbols[x]=Movers_data_view.list_of_symbols[x].replace(disallowed_substr3, "")
+                Movers_data_view.list_of_symbols[x]=Movers_data_view.list_of_symbols[x].replace(disallowed_substr2, "")
+                Movers_data_view.list_of_descriptions[x]=Movers_data_view.list_of_descriptions[x].replace(disallowed_substr, "")
+                Movers_data_view.list_of_descriptions[x]=Movers_data_view.list_of_descriptions[x].replace(disallowed_substr2, "")
+
+            range_html=[0,1,2,3,4,5]
+
+            compact_list=zip(Movers_data_view.list_of_descriptions, Movers_data_view.list_of_symbols)
 
 
 
 
-        return render(request, 'movers_display.html', 
-            {'description': compact_list })
+            return render(request, 'movers_display.html', 
+                {'description': compact_list })
+
+        else:
+
+            return render(request, 'movers_display.html', 
+                {'nothing': nothing_found})
+
 
           
 
@@ -465,7 +490,7 @@ class Movers_Query_view(FormView):
 
         movers_query_obj=get_movers(index,direction,change)
 
-        # print(index)
+        #print("type of query obj: ",type(movers_query_obj))
 
     
 
@@ -485,6 +510,7 @@ class Market_hours_view (APIView):#!!!! CHECK FORMAT FOR FOREX, BONDS ETC...!!!!
 
     def get(self,request, format=None):
 
+        global hours_query_object
         is_open=False#tells us if the market is open
         
 
@@ -496,58 +522,63 @@ class Market_hours_view (APIView):#!!!! CHECK FORMAT FOR FOREX, BONDS ETC...!!!!
         #     "sales":177,
         #     "customers":120,
         # }
-       
-        jsonObject = list(hours_query_object.items()) #this shenanigan is supposed to extract the nested dictio i want into a json object list
-        needed_string=jsonObject[0][1]
-        jsonObject=list(needed_string.items())
-        needed_string=jsonObject[0][1]
-        jsonObject=list(needed_string.items())
 
-    
-        if(jsonObject[6][1]==True):#if the stock market is open, we know
-            is_open=True
+      
+
+        hours_query_object=hours_query_object.split(",")
+        
+
+       
+       
+        index=0
+        hrs_str=""
+        for x in hours_query_object:
+            if "start" in x or "end" in x:
+                is_open=True
+                hrs_str=hrs_str+x+","
+
+        hrs_str=hrs_str.split("{")
+
+        hrs_str_two=""
+
+        for x in hrs_str:
+
+            if "start" in x or "end" in x:
+                
+                hrs_str_two=hrs_str_two+x+","
+                #print(hrs_str_two)
+        
+        hrs_str_two=hrs_str_two.split(",")
+
+        hrs_str_3=""
+        for x in hrs_str_two:
+           if "start" in x or "end" in x:
+                
+                hrs_str_3=hrs_str_3+x+","
+                #print(hrs_str_two)
+        forbid_string1="\""
+        forbid_string2="{"
+        forbid_string3="}"
+        forbid_string4="["
+        forbid_string5="]"
+
+        hrs_str_3=hrs_str_3.replace(forbid_string1,'')
+        hrs_str_3=hrs_str_3.replace(forbid_string2,'')
+        hrs_str_3=hrs_str_3.replace(forbid_string3,'')
+        hrs_str_3=hrs_str_3.replace(forbid_string4,'')
+        hrs_str_3=hrs_str_3.replace(forbid_string5,'')
+
+        hrs_str_3=hrs_str_3.split(',')
+           
+
+
+        print(hrs_str_3)
+           
+       
 
         if is_open==True: #if market is open
-            needed_string=jsonObject[7][1]
-            jsonObject=list(needed_string.items())
-
-        # for x in jsonObject:
-        #     print(x)
-
-            pre_market=jsonObject[0]
-            regular_market=jsonObject[1]
-            post_market=jsonObject[2]
-
-            title, pre_market_data=pre_market #this transfors all the data needed to a string
-
-            pre_market_data=list(pre_market)
-            pre_market_data=pre_market_data[1]
             
-            pre_market_data=str(pre_market_data)
-
-            title, reg_market_data=regular_market
-
-            reg_market_data=list(regular_market)
-            reg_market_data=reg_market_data[1]
-            
-            reg_market_data=str(reg_market_data)
-
-            title, post_market_data=post_market
-
-            post_market_data=list(post_market)
-            post_market_data=post_market_data[1]
-            
-            post_market_data=str(post_market_data)
-            disallowed_characters="{[]}'"
-            for ch in disallowed_characters:
-                pre_market_data=pre_market_data.replace(ch,"")
-                reg_market_data=reg_market_data.replace(ch,"")
-                post_market_data=post_market_data.replace(ch,"")
-                
-
-            data=[is_open,pre_market_data,reg_market_data,post_market_data]
-
-            # print(pre_market_data)
+            data=hrs_str_3
             
             return render(request, 'market_hrs.html', {'data': data})
         
@@ -583,7 +614,7 @@ class Market_Query_view(FormView):
 
         hours_query_object=single_market_hours(Market, date_maker)
 
-        # print(date_maker)
+        #print(hours_query_object)
 
         
 
@@ -889,6 +920,8 @@ class options_data_view (APIView): #this allows us to see  option data
 
     def get(self,request, format=None):
 
+        data_view=1
+
         global options_query_object #the plan is to take string returned by function them extract symbols
 
         data1=""
@@ -945,7 +978,7 @@ class options_data_view (APIView): #this allows us to see  option data
            
         
         #print(data4)
-        return render(request, 'options_symbols.html', {'data': data4})
+        return render(request, 'options_symbols.html', {'data': data4, 'data_view': data_view})
 
 
 class form_example_view(FormView):
