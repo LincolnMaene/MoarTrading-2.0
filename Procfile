@@ -1,3 +1,3 @@
-web: gunicorn Git attempt 24.wsgi:application --preload -b
+web: gunicorn less_talking_more_trading.wsgi
 python manage.py collectstatic --noinput
 manage.py migrate
