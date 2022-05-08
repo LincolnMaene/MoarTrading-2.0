@@ -1,3 +1,3 @@
-web: gunicorn less_talking_more_trading.wsgi
+web: gunicorn wsgi:application
 python manage.py collectstatic --noinput
 manage.py migrate
