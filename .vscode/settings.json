@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/9bc2ff2b-61cc-45d1-b2ff-9ebf1e5ea59f/resourceGroups/appsvc_linux_centralus/providers/Microsoft.Web/sites/MoarTrading",
+    "appService.deploySubpath": "."
+}
