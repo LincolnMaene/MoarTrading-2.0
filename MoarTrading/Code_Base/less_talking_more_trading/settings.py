@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-cusds*o61+yt3%mp$6qqzxu1&)52w9o9zik&#g+5n*%e37)q*f
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['moartrading.herokuapp.com/','127.0.0.1']
+ALLOWED_HOSTS = ['moartrading.herokuapp.com','127.0.0.1']
 
 CRISPY_TEMPLATE_PACK='bootstrap4'
 
